@@ -1,0 +1,64 @@
+def combine_lists(list1, list2):
+    p1 = 0
+    p2 = 0
+    combined_list = []
+    
+    while p1 < len(list1) and p2 < len(list2):
+        elem1 = list1[p1]
+        elem2 = list2[p2]
+        
+        pos1 = elem1["positions"]
+        pos2 = elem2["positions"]
+        
+        overlap_start = max(pos1[0], pos2[0])
+        overlap_end = min(pos1[1], pos2[1])
+        overlap_length = max(0, overlap_end - overlap_start)
+        
+        width1 = pos1[1] - pos1[0]
+        width2 = pos2[1] - pos2[0]
+
+        merge_condition1 = (width1 > 0 and overlap_length > width1 / 2)
+        merge_condition2 = (width2 > 0 and overlap_length > width2 / 2)
+        
+        if merge_condition1 or merge_condition2:
+            if pos1[0] <= pos2[0]:
+                new_positions = pos1
+            else:
+                new_positions = pos2
+            
+            new_values = elem1["values"] + elem2["values"]
+            
+            combined_list.append({ "positions": new_positions, "values": new_values })
+            
+            p1 += 1
+            p2 += 1
+        else:
+            if pos1[0] <= pos2[0]:
+                combined_list.append(elem1)
+                p1 += 1
+            else:
+                combined_list.append(elem2)
+                p2 += 1
+
+    while p1 < len(list1):
+        combined_list.append(list1[p1])
+        p1 += 1
+    
+    while p2 < len(list2):
+        combined_list.append(list2[p2])
+        p2 += 1
+        
+    return combined_list
+
+list_a = [
+    {"positions": [10, 50], "values": ["A"]},
+    {"positions": [60, 80], "values": ["C"]},
+]
+list_b = [
+    {"positions": [20, 55], "values": ["B"]},
+    {"positions": [90, 100], "values": ["D"]},
+]
+
+import json
+combined = combine_lists(list_a, list_b)
+print(json.dumps(combined, indent=4))
